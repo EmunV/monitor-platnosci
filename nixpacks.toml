@@ -1,5 +1,0 @@
-[phases.setup]
-nixPkgs = ["python311", "python311Packages.pip"]
-
-[start]
-cmd = "gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 300"
