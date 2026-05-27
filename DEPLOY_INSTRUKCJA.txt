@@ -1,0 +1,139 @@
+══════════════════════════════════════════════════════════════
+  Monitor Platnosci — INSTRUKCJA WDROZENIA NA SERWER
+  Usluga: Railway.app (darmowy plan, bez karty kredytowej)
+══════════════════════════════════════════════════════════════
+
+
+CO DOSTANIESZ
+─────────────
+  Strona internetowa dostepna z dowolnego miejsca na swiecie
+  Adres: https://monitor-platnosci-XXXX.railway.app
+  Logowanie haslem — nikt niepowolany nie zobaczy danych
+  Panel do wgrywania wyciagów i aktualizacji danych
+
+
+KROK 1 — ZALOZ KONTO NA GITHUB (jesli nie masz)
+─────────────────────────────────────────────────
+  1. Wejdz na: https://github.com
+  2. Kliknij "Sign up" i zaloz darmowe konto
+  3. Potwierdz email
+
+
+KROK 2 — WGRAJ PLIKI NA GITHUB
+────────────────────────────────
+  1. Zaloguj sie na GitHub
+  2. Kliknij "+" → "New repository"
+  3. Nazwa: monitor-platnosci
+  4. Ustaw na "Private" (prywatne — wazne!)
+  5. Kliknij "Create repository"
+
+  Nastepnie wgraj te pliki do repozytorium:
+     app.py
+     requirements.txt
+     Procfile
+     runtime.txt
+     config.json        (z Twoimi kluczami API Betterfly)
+     update_monitor.py
+     monitor_template.html
+
+  Jak wgrac pliki:
+  - Kliknij "uploading an existing file" na stronie repozytorium
+  - Przeciagnij wszystkie pliki naraz
+  - Kliknij "Commit changes"
+
+
+KROK 3 — ZALOZ KONTO NA RAILWAY.APP
+─────────────────────────────────────
+  1. Wejdz na: https://railway.app
+  2. Kliknij "Login" → "Login with GitHub"
+  3. Autoryzuj dostep do GitHub
+  4. Railway.app jest darmowy do 5$/m-c zuzycia
+     (maly monitor nie przekroczy tego limitu)
+
+
+KROK 4 — WDROZ APLIKACJE
+──────────────────────────
+  1. Na stronie Railway kliknij "New Project"
+  2. Wybierz "Deploy from GitHub repo"
+  3. Wybierz repozytorium: monitor-platnosci
+  4. Railway automatycznie wykryje ze to aplikacja Python
+  5. Kliknij "Deploy" — poczekaj ok. 2 minuty
+
+  Po wdrozeniu Railway poda Ci adres URL, np.:
+  https://monitor-platnosci-production.up.railway.app
+
+
+KROK 5 — USTAW HASLA (BARDZO WAZNE!)
+───────────────────────────────────────
+  Domyslne hasla sa niezabezpieczone — zmien je!
+
+  W Railway wejdz w: Settings → Variables i dodaj:
+
+  SECRET_KEY    = (wygeneruj na: https://randomkeygen.com)
+  ADMIN_USER    = jacek
+  ADMIN_PASS    = (wymysl mocne haslo, min. 10 znakow)
+  USER2_NAME    = ksiegowa
+  USER2_PASS    = (inne mocne haslo dla ksiegowej)
+
+  Po dodaniu zmiennych Railway automatycznie zrestartuje aplikacje.
+
+
+KROK 6 — PIERWSZE UZYCIE
+──────────────────────────
+  1. Wejdz na swoj adres URL
+  2. Zaloguj sie haslem ustawionym w kroku 5
+  3. Kliknij "Panel" w prawym gornym rogu
+  4. Wgraj pliki CSV z mBanku (przeciagnij do okna)
+  5. Kliknij "Aktualizuj dane teraz"
+  6. Poczekaj ok. 1-2 minuty
+  7. Kliknij "Otworz monitor"
+
+
+JAK UDOSTEPNIC DOSTEP INNYM OSOBOM (np. ksiegowej)
+────────────────────────────────────────────────────
+  Wyslij tej osobie:
+  - Adres URL Twojej strony
+  - Login: ksiegowa
+  - Haslo: (to co ustawiles w USER2_PASS)
+
+  Ksiegowa wchodzi na strone, loguje sie i widzi monitor.
+  Nie ma dostepu do panelu administratora.
+
+
+JAK AKTUALIZOWAC DANE CO MIESIAC
+──────────────────────────────────
+  1. Pobierz wyciagi CSV z mBanku (3 pliki)
+  2. Wejdz na swoja strone internetowa
+  3. Kliknij "Panel"
+  4. Wgraj pliki CSV
+  5. Kliknij "Aktualizuj dane teraz"
+  6. Gotowe — wszyscy uzatkownicy widza aktualne dane
+
+  Faktury z Betterfly sa pobierane automatycznie przez API.
+  Musisz tylko dostarczyc wyciagi bankowe.
+
+
+BEZPIECZENSTWO
+───────────────
+  ✓ Polaczenie szyfrowane (HTTPS)
+  ✓ Logowanie haslem
+  ✓ Repozytorium prywatne na GitHub
+  ✓ Dane widoczne tylko po zalogowaniu
+
+  PAMIETAJ: ustaw mocne haslo w zmiennych Railway!
+  Nigdy nie udostepniaj hasla przez niezaszyfrowane kanalyw.
+
+
+KOSZTY
+───────
+  Railway.app: darmowy plan pokrywa ~500 godzin/miesiac
+  Monitor bedzie uzywal okolo 10-20 godzin/miesiac
+  → Calkowicie za darmo
+
+  Gdyby przekroczyl limit: plan Hobby kosztuje 5$/m-c (~20 zl)
+
+
+POMOC TECHNICZNA
+──────────────────
+  Jesli cos nie dziala — zrob zrzut ekranu bledu i
+  wklej do Claude (chat.claude.ai) z opisem problemu.

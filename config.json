@@ -1,0 +1,38 @@
+{
+  "_comment": "Dane dostępowe do API Betterfly. Dla każdej firmy: Konto Użytkownika → Zarządzaj kontem → Publiczne API",
+  "firms": [
+    {
+      "co": 0,
+      "name": "EMUN Valuations Sp. z o.o.",
+      "nip": "5252983281",
+      "konto": "96 1140 2004 0000 3502 8434 7003",
+      "konto_suffix": "7003",
+      "vat_rate": 23,
+      "client_id": "WPISZ_CLIENT_ID_EMUN_VALUATIONS",
+      "client_secret": "WPISZ_CLIENT_SECRET_EMUN_VALUATIONS"
+    },
+    {
+      "co": 1,
+      "name": "JACEK WINNICKI Wycena Nieruchomości",
+      "nip": "9211815270",
+      "konto": "61 1140 2004 0000 3002 7791 5032",
+      "konto_suffix": "5032",
+      "vat_rate": 23,
+      "client_id": "WPISZ_CLIENT_ID_JW_WYCENA",
+      "client_secret": "WPISZ_CLIENT_SECRET_JW_WYCENA"
+    },
+    {
+      "co": 2,
+      "name": "EMUN Nieruchomości Sp. z o.o.",
+      "nip": "9212034014",
+      "konto": "78 1140 2004 0000 3202 7661 4246",
+      "konto_suffix": "4246",
+      "vat_rate": 0,
+      "client_id": "WPISZ_CLIENT_ID_EMUN_NIERUCHOMOSCI",
+      "client_secret": "WPISZ_CLIENT_SECRET_EMUN_NIERUCHOMOSCI"
+    }
+  ],
+  "bank_folder": "./bank",
+  "output_html": "./monitor_platnosci.html",
+  "fetch_from_date": "2025-01-01"
+}
