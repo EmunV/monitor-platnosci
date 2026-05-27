@@ -8,8 +8,8 @@
       "konto": "96 1140 2004 0000 3502 8434 7003",
       "konto_suffix": "7003",
       "vat_rate": 23,
-      "client_id": "WPISZ_CLIENT_ID_EMUN_VALUATIONS",
-      "client_secret": "WPISZ_CLIENT_SECRET_EMUN_VALUATIONS"
+      "client_id": "Yn66f6hB9AK8G9rjGmiGBA0300008e08",
+      "client_secret": "dbEuZsw2BdIKROqyy4DlQdCPpnJ4XxlCPt0cmcLySpPzm7wR"
     },
     {
       "co": 1,
@@ -18,8 +18,8 @@
       "konto": "61 1140 2004 0000 3002 7791 5032",
       "konto_suffix": "5032",
       "vat_rate": 23,
-      "client_id": "WPISZ_CLIENT_ID_JW_WYCENA",
-      "client_secret": "WPISZ_CLIENT_SECRET_JW_WYCENA"
+      "client_id": "bsL3sGXcFil+FxFbuEEFlw00009b1b82",
+      "client_secret": "+qCyNA03nEdhKSHRmcqfeUuCnIknuSCkQ4/N8YQE9wMTvZd1"
     },
     {
       "co": 2,
@@ -28,8 +28,8 @@
       "konto": "78 1140 2004 0000 3202 7661 4246",
       "konto_suffix": "4246",
       "vat_rate": 0,
-      "client_id": "WPISZ_CLIENT_ID_EMUN_NIERUCHOMOSCI",
-      "client_secret": "WPISZ_CLIENT_SECRET_EMUN_NIERUCHOMOSCI"
+      "client_id": "ScBuhspNKJ2iklND2JQWLA0000012825",
+      "client_secret": "MRg4XDms7K8rsv5k2azrsEEvLeJQby71JpUQJEhmR+6K3Uay"
     }
   ],
   "bank_folder": "./bank",
