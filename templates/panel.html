@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Panel administratora</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f8fafc;color:#0f172a}
+.top{background:#1e293b;color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
+.top h1{font-size:14px;font-weight:700}
+.top a{color:#94a3b8;font-size:12px;text-decoration:none}
+.top a:hover{color:#fff}
+.main{max-width:860px;margin:24px auto;padding:0 20px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px 24px;margin-bottom:16px}
+.card h2{font-size:13px;font-weight:700;margin-bottom:14px;color:#334155}
+.badge{display:inline-flex;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px}
+.g-ok{background:#e6f7ef;color:#1a7a4a}.g-err{background:#fde8e8;color:#c0392b}
+.g-info{background:#e8f0fe;color:#1a56c4}
+.btn{padding:9px 18px;font-size:12px;font-weight:600;border-radius:8px;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:#0f172a;color:#fff}.btn-primary:hover{background:#334155}
+.btn-secondary{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}.btn-secondary:hover{background:#e2e8f0}
+.btn-red{background:#fde8e8;color:#c0392b;border:1px solid #f9a8a8}.btn-red:hover{background:#fecaca}
+.file-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.file-row{display:flex;align-items:center;justify-content:space-between;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px}
+.file-name{font-size:12px;font-family:monospace;color:#334155}
+.drop-zone{border:2px dashed #cbd5e1;border-radius:10px;padding:28px;text-align:center;color:#94a3b8;font-size:13px;cursor:pointer;transition:.2s}
+.drop-zone:hover,.drop-zone.drag{border-color:#3b82f6;background:#eff6ff;color:#3b82f6}
+.drop-zone input{display:none}
+#log{background:#1e293b;color:#4ade80;padding:14px;border-radius:8px;font-family:monospace;font-size:11px;height:200px;overflow-y:auto;display:none;margin-top:12px;white-space:pre-wrap}
+.spinner{display:none;width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:#f8fafc;border-radius:8px;padding:10px 14px;border:1px solid #e2e8f0}
+.stat-lbl{font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;margin-bottom:3px}
+.stat-val{font-size:18px;font-weight:700;color:#0f172a}
+</style></head>
+<body>
+<div class="top">
+  <h1>📊 Monitor Platnosci &mdash; Panel</h1>
+  <div style="display:flex;gap:16px;align-items:center">
+    <a href="/">&#x2190; Otworz monitor</a>
+    <a href="/logout">Wyloguj</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- STATUS -->
+  <div class="card">
+    <h2>Status</h2>
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-lbl">Plik monitora</div>
+        <div class="stat-val" style="font-size:13px">
+          {% if monitor_exists %}
+            <span class="badge g-ok">&#x2713; Aktualny</span>
+          {% else %}
+            <span class="badge g-err">Brak danych</span>
+          {% endif %}
+        </div>
+        {% if monitor_exists %}<div style="font-size:10px;color:#94a3b8;margin-top:3px">{{ monitor_size }} KB &bull; {{ monitor_mtime }}</div>{% endif %}
+      </div>
+      <div class="stat"><div class="stat-lbl">Wyciagi bankowe</div>
+        <div class="stat-val">{{ bank_files|length }}</div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:3px">plikow CSV w folderze</div>
+      </div>
+      <div class="stat"><div class="stat-lbl">Konfiguracja API</div>
+        <div class="stat-val" style="font-size:13px">
+          {% if config_exists %}
+            <span class="badge g-ok">&#x2713; OK</span>
+          {% else %}
+            <span class="badge g-err">Brak config.json</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AKTUALIZACJA -->
+  <div class="card">
+    <h2>&#x21BB; Aktualizacja danych</h2>
+    <p style="font-size:12px;color:#64748b;margin-bottom:14px">
+      Pobiera faktury z Betterfly API + przetwarza wyciagi bankowe.<br>
+      Upewnij sie ze pliki CSV sa wgrane ponizej.
+    </p>
+    <button class="btn btn-primary" id="btn-update" onclick="runUpdate()">
+      <span class="spinner" id="spin"></span>
+      <span id="btn-txt">&#x2B06; Aktualizuj dane teraz</span>
+    </button>
+    <div id="log"></div>
+    <div id="update-result" style="margin-top:10px;font-size:12px"></div>
+  </div>
+
+  <!-- WYCIAGI BANKOWE -->
+  <div class="card">
+    <h2>&#x1F4C4; Wyciagi bankowe (CSV z mBanku)</h2>
+
+    {% if bank_files %}
+    <div class="file-list">
+      {% for f in bank_files %}
+      <div class="file-row">
+        <span class="file-name">{{ f }}</span>
+        <form method="POST" action="/delete-bank/{{ f }}" style="margin:0" onsubmit="return confirm('Usunac plik {{ f }}?')">
+          <button class="btn btn-red" style="padding:4px 10px;font-size:10px">Usun</button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p style="font-size:12px;color:#94a3b8;margin-bottom:14px">Brak plikow. Wgraj wyciagi z mBanku.</p>
+    {% endif %}
+
+    <form method="POST" action="/upload-bank" enctype="multipart/form-data" id="upload-form">
+      <div class="drop-zone" id="drop" onclick="document.getElementById('file-inp').click()">
+        <div style="font-size:24px;margin-bottom:8px">&#x2B06;</div>
+        <div>Kliknij lub przeciagnij pliki CSV z mBanku</div>
+        <div style="font-size:11px;margin-top:4px">Mozna wgrac kilka plikow naraz</div>
+        <input type="file" id="file-inp" name="csvfiles" multiple accept=".csv">
+      </div>
+      <button type="submit" class="btn btn-secondary" style="margin-top:10px">Wgraj zaznaczone pliki</button>
+    </form>
+  </div>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div style="background:#e6f7ef;border:1px solid #b2dfcc;border-radius:8px;padding:10px 14px;font-size:12px;color:#1a7a4a">
+      {{ messages[0] }}
+    </div>
+    {% endif %}
+  {% endwith %}
+
+</div>
+
+<script>
+// Drag-and-drop
+var drop=document.getElementById('drop'),inp=document.getElementById('file-inp');
+drop.addEventListener('dragover',function(e){e.preventDefault();drop.classList.add('drag');});
+drop.addEventListener('dragleave',function(){drop.classList.remove('drag');});
+drop.addEventListener('drop',function(e){
+  e.preventDefault();drop.classList.remove('drag');
+  inp.files=e.dataTransfer.files;
+  document.getElementById('upload-form').submit();
+});
+inp.addEventListener('change',function(){if(inp.files.length)document.getElementById('upload-form').submit();});
+
+var _pollTimer = null;
+function runUpdate(){
+  var btn=document.getElementById('btn-update');
+  var spin=document.getElementById('spin');
+  var txt=document.getElementById('btn-txt');
+  var log=document.getElementById('log');
+  var res=document.getElementById('update-result');
+  btn.disabled=true; spin.style.display='inline-block';
+  txt.textContent='Trwa aktualizacja...';
+  log.style.display='block'; log.textContent='Uruchamianie skryptu...\n'; res.textContent='';
+  fetch('/update',{method:'POST'})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.status==='started'||d.status==='running'){
+        log.textContent='Laczenie z Betterfly API...\n';
+        _pollTimer = setInterval(pollStatus, 3000);
+      } else {
+        log.textContent=d.message||'Blad';
+        finishUpdate(false);
+      }
+    })
+    .catch(function(e){
+      log.textContent='Blad startu: '+e;
+      finishUpdate(false);
+    });
+}
+function pollStatus(){
+  fetch('/update-status')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.output) {
+        document.getElementById('log').textContent=d.output;
+        document.getElementById('log').scrollTop=9999;
+      }
+      if(d.elapsed) {
+        document.getElementById('btn-txt').textContent='Trwa aktualizacja... ('+d.elapsed+'s)';
+      }
+      if(!d.running){
+        clearInterval(_pollTimer);
+        finishUpdate(d.success);
+      }
+    })
+    .catch(function(){});
+}
+function finishUpdate(success){
+  var res=document.getElementById('update-result');
+  if(success){
+    res.innerHTML='<span style="color:#16a34a;font-weight:600">&#x2714; Aktualizacja zakonczona. <a href="/" style="color:#2563eb">Otworz monitor</a></span>';
+  } else {
+    res.innerHTML='<span style="color:#c0392b;font-weight:600">&#x2718; Blad aktualizacji. Sprawdz logi powyzej.</span>';
+  }
+  var btn=document.getElementById('btn-update');
+  var spin=document.getElementById('spin');
+  btn.disabled=false; spin.style.display='none';
+  document.getElementById('btn-txt').textContent='Aktualizuj dane teraz';
+}
+</script>
+</body></html>
