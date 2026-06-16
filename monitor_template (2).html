@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="pl"><head><meta charset="utf-8">
+<title>Monitor Płatności — 3 Firmy</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;background:#f0f2f5;color:#111}
+
+/* ── TOP BAR ── */
+.topbar{background:#1a1f2e;color:#fff;padding:10px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #2d3548}
+.topbar h1{font-size:14px;font-weight:700;letter-spacing:.03em;display:flex;align-items:center;gap:8px}
+.topbar .ver{font-size:10px;color:#6b7280;margin-left:auto}
+.topbar a{font-size:11px;color:#94a3b8;text-decoration:none;padding:4px 10px;border-radius:5px;border:1px solid #334155}
+.topbar a:hover{background:#334155;color:#fff}
+
+/* ── FIRMA TABS ── */
+.co-tabs{display:flex;background:#fff;border-bottom:2px solid #e5e7eb;padding:0 20px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.co-tab{padding:11px 18px;font-size:12px;font-weight:600;cursor:pointer;color:#9ca3af;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .15s}
+.co-tab:hover{color:#374151}.co-tab.active{color:#111;border-bottom-color:#1a1f2e}
+.co-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+
+/* ── MAIN ── */
+.main{padding:16px 20px}
+
+/* ── METRYKI ── */
+.sum4{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.metric{border-radius:10px;padding:12px 16px;border:1px solid #e5e7eb;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.mlabel{font-size:10px;color:#9ca3af;margin-bottom:4px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.mval{font-size:20px;font-weight:700;line-height:1.1}
+.mval.red{color:#dc2626}.mval.grn{color:#16a34a}.mval.org{color:#d97706}.mval.blu{color:#2563eb}.mval.pur{color:#7c3aed}
+.msub{font-size:10px;color:#9ca3af;margin-top:3px}
+.pgbar{display:flex;align-items:center;gap:5px;font-size:10px;color:#9ca3af;margin-top:5px}
+.pgbar-track{flex:1;height:4px;background:#f3f4f6;border-radius:2px;overflow:hidden}
+.pgbar-fill{height:100%;border-radius:2px}
+
+/* ── TAB MENU ── */
+.mtabs{display:flex;border-bottom:2px solid #e5e7eb;margin-bottom:14px;gap:2px}
+.mtab{padding:8px 16px;font-size:11px;font-weight:600;cursor:pointer;color:#9ca3af;border-bottom:3px solid transparent;margin-bottom:-2px;border-radius:6px 6px 0 0;transition:all .12s}
+.mtab:hover{color:#374151;background:#f9fafb}.mtab.active{color:#111;border-bottom-color:#2563eb;background:#f0f5ff}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+.toolbar input,.toolbar select{font-size:11px;height:30px;padding:0 9px;border-radius:6px;border:1px solid #d1d5db;background:#fff;color:#374151}
+.toolbar input{flex:1;min-width:140px}
+.toolbar input:focus,.toolbar select:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 2px #dbeafe}
+.btn{height:30px;padding:0 12px;font-size:11px;border-radius:6px;border:1px solid #d1d5db;cursor:pointer;background:#fff;color:#374151;font-weight:500;transition:background .12s}
+.btn:hover{background:#f3f4f6}
+
+/* ── TABELA ── */
+.tbl{border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;background:#fff;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9ca3af;padding:8px 11px;background:#f9fafb;border-bottom:1px solid #e5e7eb;text-align:left;cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{background:#f3f4f6;color:#374151}
+td{padding:8px 11px;border-bottom:1px solid #f3f4f6;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+
+/* Status-stripe po lewej */
+tr.ov td:first-child{border-left:3px solid #dc2626}
+tr.pe td:first-child{border-left:3px solid #f59e0b}
+tr.pa td:first-child{border-left:3px solid #16a34a}
+tr.pt td:first-child{border-left:3px solid #2563eb}
+tr.ov:hover td{background:#fff8f8}
+tr.pe:hover td{background:#fffbeb}
+tr.pa:hover td{background:#f0fdf4}
+tr.pt:hover td{background:#eff6ff}
+
+/* ── BADGES / PILLS ── */
+.pill{display:inline-flex;align-items:center;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;gap:3px}
+.p-red{background:#fee2e2;color:#dc2626}
+.p-org{background:#fef3c7;color:#b45309}
+.p-grn{background:#dcfce7;color:#16a34a}
+.p-blu{background:#dbeafe;color:#1d4ed8}
+.p-gry{background:#f3f4f6;color:#6b7280}
+.p-pur{background:#ede9fe;color:#7c3aed}
+
+.case-badge{display:inline-flex;align-items:center;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#f5f3ff;color:#6d28d9;white-space:nowrap;font-family:'Courier New',monospace;letter-spacing:.03em}
+
+/* ── INLINE DETAIL (data + termin + nr FV) ── */
+.fv-meta{display:flex;flex-direction:column;gap:2px}
+.fv-meta .fv-nr{font-weight:700;font-size:11px;color:#111}
+.fv-meta .fv-dates{font-size:9px;color:#9ca3af;display:flex;gap:8px;flex-wrap:wrap}
+.fv-meta .fv-dates span{display:flex;align-items:center;gap:2px}
+
+.partner-cell{overflow:hidden}
+.partner-name{font-size:11px;font-weight:600;color:#1f2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.partner-sub{font-size:9px;color:#9ca3af;margin-top:1px;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+
+.bank-cell{display:flex;flex-direction:column;gap:2px}
+.bank-kwota{font-size:11px;font-weight:700;color:#16a34a}
+.bank-dt{font-size:9px;color:#9ca3af}
+.bank-desc{font-size:9px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+
+.due-badge{display:inline-flex;align-items:center;font-size:10px;padding:2px 7px;border-radius:5px;white-space:nowrap;font-weight:500}
+.due-over{background:#fee2e2;color:#dc2626}
+.due-soon{background:#fef9c3;color:#b45309}
+.due-ok{background:#f0fdf4;color:#166534}
+
+.sub{font-size:9px;color:#9ca3af;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.empty{text-align:center;color:#9ca3af;padding:40px;font-size:11px}
+.note{font-size:11px;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:8px 12px;margin-bottom:14px}
+.info{font-size:10px;color:#9ca3af;margin-top:6px;display:flex;align-items:center;gap:6px}
+.co-bar{margin-bottom:14px;padding:10px 14px;background:#fff;border-radius:8px;border:1px solid #e5e7eb;display:flex;align-items:center;gap:10px;font-size:11px}
+
+/* ── ZBIORCZY ── */
+.zbior-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.zbior-card{border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.zbior-header{padding:11px 16px;font-size:12px;font-weight:700;color:#fff}
+.zbior-body{padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.zbior-total{border:2px solid #1a1f2e;border-radius:12px;overflow:hidden;background:#fff}
+.zbior-total-header{background:#1a1f2e;color:#fff;padding:11px 16px;font-size:12px;font-weight:700}
+.zbior-total-body{padding:14px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+</style></head>
+<body>
+
+<div class="topbar">
+  <h1>📊 Monitor Płatności — 3 Firmy</h1>
+  <div style="display:flex;gap:8px;align-items:center">
+    <div class="ver">Zaktualizowano: %%UPDATED%%</div>
+    <a href="/panel">⚙ Panel</a>
+    <a href="/logout">Wyloguj</a>
+  </div>
+</div>
+
+<div class="co-tabs">
+  <div class="co-tab active" onclick="setCo(0,this)"><span class="co-dot" style="background:#2563eb"></span>EMUN Valuations</div>
+  <div class="co-tab" onclick="setCo(1,this)"><span class="co-dot" style="background:#16a34a"></span>JW Wycena Nieruchomości</div>
+  <div class="co-tab" onclick="setCo(2,this)"><span class="co-dot" style="background:#d97706"></span>EMUN Nieruchomości</div>
+  <div class="co-tab" onclick="setCo(-1,this)" style="margin-left:auto">⚡ Zestawienie zbiorcze</div>
+</div>
+
+<div class="main">
+  <div id="co-bar" class="co-bar" style="display:none"></div>
+  <div id="co-note" class="note" style="display:none"></div>
+
+  <div class="mtabs">
+    <div class="mtab active" onclick="showTab('nal',this)">📥 Należności</div>
+    <div class="mtab" onclick="showTab('zob',this)">📤 Zobowiązania</div>
+    <div class="mtab" onclick="showTab('bank',this)">🏦 Transakcje bankowe</div>
+    <div class="mtab" id="tab-zbior-btn" style="display:none" onclick="showTab('zbior',this)">📊 Zestawienie</div>
+  </div>
+
+  <!-- ════════════════════════════════ NALEŻNOŚCI ════════════════════════════════ -->
+  <div id="tab-nal">
+    <div class="sum4" id="nal-kpi"></div>
+    <div class="toolbar">
+      <input type="text" id="nal-q" oninput="renderNal()" placeholder="Szukaj: numer FV, nabywca, nr sprawy…">
+      <select id="nal-st" onchange="renderNal()">
+        <option value="">Wszystkie statusy</option>
+        <option value="unpaid">❌ Bez wpływu</option>
+        <option value="partial">🔶 Częściowe</option>
+        <option value="paid">✅ Opłacone / W banku</option>
+        <option value="overdue">🔴 Przeterminowane</option>
+      </select>
+      <select id="nal-yr" onchange="nalYrChanged()">
+        <option value="">Wszystkie lata</option>
+        <option value="2025">2025</option><option value="2026">2026</option>
+      </select>
+      <select id="nal-mo" onchange="renderNal()"><option value="">Wszystkie miesiące</option></select>
+      <button class="btn" onclick="exportTab('nal')">⬇ CSV</button>
+    </div>
+
+    <div class="tbl"><table>
+      <thead><tr>
+        <th style="width:140px" onclick="sortTable('nal','nr')">Numer FV ↕</th>
+        <th style="width:90px" onclick="sortTable('nal','data')">Data wyst. ↕</th>
+        <th onclick="sortTable('nal','partner')">Kontrahent / Nr sprawy</th>
+        <th style="width:90px" onclick="sortTable('nal','due')">Termin płatn.</th>
+        <th style="width:80px;text-align:right" onclick="sortTable('nal','netto')">Netto</th>
+        <th style="width:68px;text-align:right">VAT</th>
+        <th style="width:90px;text-align:right" onclick="sortTable('nal','brutto')">Brutto</th>
+        <th style="width:110px">Status</th>
+        <th style="width:120px">Przelew bankowy</th>
+      </tr></thead>
+      <tbody id="nal-body"></tbody>
+    </table></div>
+    <div class="info" id="nal-info"></div>
+  </div>
+
+  <!-- ════════════════════════════════ ZOBOWIĄZANIA ════════════════════════════════ -->
+  <div id="tab-zob" style="display:none">
+    <div class="sum4" id="zob-kpi"></div>
+    <div class="toolbar">
+      <input type="text" id="zob-q" oninput="renderZob()" placeholder="Szukaj: numer FV, kontrahent, nr sprawy…">
+      <select id="zob-st" onchange="renderZob()">
+        <option value="">Wszystkie</option>
+        <option value="matched">🔗 Dopasowane do banku</option>
+        <option value="unmatched">❓ Niedopasowane</option>
+        <option value="overdue">🔴 Przeterminowane</option>
+      </select>
+      <select id="zob-yr" onchange="zobYrChanged()">
+        <option value="">Wszystkie lata</option>
+        <option value="2025">2025</option><option value="2026">2026</option>
+      </select>
+      <select id="zob-mo" onchange="renderZob()"><option value="">Wszystkie miesiące</option></select>
+      <button class="btn" onclick="exportTab('zob')">⬇ CSV</button>
+    </div>
+
+    <div class="tbl"><table>
+      <thead><tr>
+        <th style="width:155px" onclick="sortTable('zob','nr')">Numer FV ↕</th>
+        <th style="width:90px" onclick="sortTable('zob','data')">Data wyst. ↕</th>
+        <th onclick="sortTable('zob','partner')">Kontrahent / Nr sprawy</th>
+        <th style="width:90px" onclick="sortTable('zob','due')">Termin płatn.</th>
+        <th style="width:80px;text-align:right" onclick="sortTable('zob','netto')">Netto</th>
+        <th style="width:68px;text-align:right">VAT</th>
+        <th style="width:90px;text-align:right" onclick="sortTable('zob','brutto')">Brutto</th>
+        <th style="width:105px">Status</th>
+        <th style="width:125px">Przelew bankowy</th>
+      </tr></thead>
+      <tbody id="zob-body"></tbody>
+    </table></div>
+    <div class="info" id="zob-info"></div>
+  </div>
+
+  <!-- ════════════════════════════════ BANK ════════════════════════════════ -->
+  <div id="tab-bank" style="display:none">
+    <div class="sum4" id="bank-kpi"></div>
+    <div class="toolbar">
+      <input type="text" id="bank-q" oninput="renderBank()" placeholder="Szukaj: opis, nr sprawy, nr FV…">
+      <select id="bank-dir" onchange="renderBank()">
+        <option value="">Wpływy i wydatki</option>
+        <option value="in">⬇ Wpływy</option>
+        <option value="out">⬆ Wydatki</option>
+      </select>
+      <select id="bank-case" onchange="renderBank()">
+        <option value="">Wszystkie operacje</option>
+        <option value="withcase">📋 Ze sprawą sądową/km</option>
+        <option value="nocase">— Bez numeru sprawy</option>
+      </select>
+      <select id="bank-match" onchange="renderBank()">
+        <option value="">Wszystkie</option>
+        <option value="matched">🔗 Dopasowane do FV</option>
+        <option value="unmatched">❓ Bez FV</option>
+      </select>
+      <select id="bank-mo" onchange="renderBank()"><option value="">Wszystkie miesiące</option></select>
+      <button class="btn" onclick="exportTab('bank')">⬇ CSV</button>
+    </div>
+
+    <div class="tbl"><table>
+      <thead><tr>
+        <th style="width:88px">Data</th>
+        <th>Opis operacji</th>
+        <th style="width:110px;text-align:right">Kwota</th>
+        <th style="width:130px">Nr sprawy</th>
+        <th style="width:130px">Faktura (FV)</th>
+      </tr></thead>
+      <tbody id="bank-body"></tbody>
+    </table></div>
+    <div class="info" id="bank-info"></div>
+  </div>
+
+  <!-- ════════════════════════════════ ZESTAWIENIE ════════════════════════════════ -->
+  <div id="tab-zbior" style="display:none">
+    <div id="zbior-content"></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   DANE
+═══════════════════════════════════════════════════════ */
+const FV = JSON.parse(atob('%%FV_B64%%'));
+const TX = JSON.parse(atob('%%TX_B64%%'));
+const PAGE = 300;
+
+const CO_CFG = [
+  {name:'EMUN Valuations Sp. z o.o.',  nip:'5252983281', konto:'96…7003', col:'#2563eb', note:null},
+  {name:'JACEK WINNICKI Wycena Nieruchomości', nip:'9211815270', konto:'61…5032', col:'#16a34a',
+   note:'⚠️ Betterfly nie śledzi statusu płatności dla JW — status opłacenia ustalany wyłącznie z wyciągu bankowego.'},
+  {name:'EMUN Nieruchomości Sp. z o.o.', nip:'9212034014', konto:'78…4246', col:'#d97706', note:null},
+];
+
+let curCo = 0;
+let nalPage = 0, zobPage = 0, bankPage = 0;
+let nalSort = {key:'data', dir:-1};
+let zobSort = {key:'data', dir:-1};
+
+/* TX lookup */
+const TX_MAP = {};
+TX.forEach(t => { TX_MAP[t.co + '_' + t.id] = t; });
+function getTx(co, id) { return id ? TX_MAP[co + '_' + id] : null; }
+
+/* ═══════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════ */
+function fmt(n) {
+  return typeof n === 'number'
+    ? n.toLocaleString('pl-PL', {minimumFractionDigits:2, maximumFractionDigits:2})
+    : '—';
+}
+
+function fmtDate(s) {
+  // "2025-03-15" → "15.03.2025"
+  if (!s || s.length < 10) return s || '—';
+  return s.slice(8,10) + '.' + s.slice(5,7) + '.' + s.slice(0,4);
+}
+
+function dueBadge(due, paid) {
+  if (!due || paid) return '<span style="color:#d1d5db;font-size:10px">—</span>';
+  const d    = new Date(due), t = new Date();
+  const diff = Math.round((d - t) / (1000*60*60*24));
+  let cls, icon, label;
+  if (diff < 0) {
+    cls = 'due-over'; icon = '🔴';
+    label = fmtDate(due) + ' <span style="font-size:9px">(+' + Math.abs(diff) + 'd)</span>';
+  } else if (diff <= 7) {
+    cls = 'due-soon'; icon = '⚡';
+    label = fmtDate(due) + ' <span style="font-size:9px">(' + diff + 'd)</span>';
+  } else {
+    cls = 'due-ok'; icon = '✓';
+    label = fmtDate(due);
+  }
+  return `<span class="due-badge ${cls}">${icon} ${label}</span>`;
+}
+
+function caseBadge(c) {
+  if (!c) return '<span style="color:#d1d5db;font-size:10px">—</span>';
+  return c.split(', ')
+    .map(s => `<span class="case-badge">⚖ ${s}</span>`)
+    .join(' ');
+}
+
+function coBadge(co) {
+  if (curCo !== -1) return '';
+  const c = CO_CFG[co];
+  const labels = ['EV','JW','EN'];
+  return `<span class="pill" style="background:${c.col}22;color:${c.col};font-size:8px;margin-right:4px">${labels[co]}</span>`;
+}
+
+function vatCell(v) {
+  return v ? `<span style="color:#6b7280">${fmt(v)}</span>`
+           : '<span style="color:#d1d5db;font-size:10px">zw.</span>';
+}
+
+/* ═══════════════════════════════════════════════════════
+   MANUAL / CASES (localStorage)
+═══════════════════════════════════════════════════════ */
+const MANUAL_KEY = 'monitor_manual_v1';
+const CASE_KEY   = 'monitor_cases_v1';
+
+function getManual() { try { return JSON.parse(localStorage.getItem(MANUAL_KEY)||'{}'); } catch(e){ return {}; } }
+function setManual(o){ localStorage.setItem(MANUAL_KEY, JSON.stringify(o)); }
+function isManual(co, nr){ return !!getManual()[co+'|'+nr]; }
+function toggleManual(co, nr){
+  const m = getManual(), k = co+'|'+nr;
+  if (m[k]) delete m[k]; else m[k] = new Date().toISOString();
+  setManual(m); renderNal();
+}
+
+function getCases(){ try { return JSON.parse(localStorage.getItem(CASE_KEY)||'{}'); } catch(e){ return {}; } }
+function getCase(co, nr, auto){ const m = getCases(), k = co+'|'+nr; return m[k] !== undefined ? m[k] : auto; }
+function doEditCase(co, nr){
+  const cur = getCase(co, nr, '');
+  const val = prompt('Numer sprawy dla faktury ' + nr + ':', cur);
+  if (val === null) return;
+  const m = getCases(); m[co+'|'+nr] = val.trim();
+  localStorage.setItem(CASE_KEY, JSON.stringify(m));
+  renderNal(); renderZob();
+}
+
+/* ═══════════════════════════════════════════════════════
+   SORTOWANIE
+═══════════════════════════════════════════════════════ */
+function sortTable(tab, key) {
+  if (tab === 'nal') {
+    if (nalSort.key === key) nalSort.dir *= -1; else { nalSort.key = key; nalSort.dir = -1; }
+    renderNal();
+  } else {
+    if (zobSort.key === key) zobSort.dir *= -1; else { zobSort.key = key; zobSort.dir = -1; }
+    renderZob();
+  }
+}
+
+function applySortFV(arr, s) {
+  return [...arr].sort((a, b) => {
+    let va = a[s.key] ?? '', vb = b[s.key] ?? '';
+    if (typeof va === 'number') return s.dir * (va - vb);
+    return s.dir * String(va).localeCompare(String(vb), 'pl');
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   NAVIGATE / TABS / FIRMA
+═══════════════════════════════════════════════════════ */
+function setCo(co, el) {
+  curCo = co;
+  document.querySelectorAll('.co-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+
+  const bar  = document.getElementById('co-bar');
+  const note = document.getElementById('co-note');
+  const zBtn = document.getElementById('tab-zbior-btn');
+
+  if (co === -1) {
+    bar.style.display = 'none';
+    note.style.display = 'none';
+    zBtn.style.display = '';
+    showTab('zbior', document.getElementById('tab-zbior-btn'));
+    renderZbior();
+  } else {
+    const c = CO_CFG[co];
+    bar.style.display = 'flex';
+    bar.innerHTML = `<span style="width:10px;height:10px;border-radius:50%;background:${c.col};display:inline-block"></span>`
+      + `<strong style="color:${c.col}">${c.name}</strong>`
+      + `<span style="color:#9ca3af">NIP: ${c.nip}</span>`
+      + `<span style="color:#9ca3af">|</span>`
+      + `<span style="color:#9ca3af">Rachunek: ${c.konto}</span>`;
+    if (c.note) { note.textContent = c.note; note.style.display = ''; }
+    else note.style.display = 'none';
+    zBtn.style.display = 'none';
+    if (document.getElementById('tab-zbior').style.display !== 'none')
+      showTab('nal', document.querySelector('.mtab'));
+  }
+
+  /* Reset month selectors */
+  document.getElementById('nal-mo').dataset.co = '';
+  document.getElementById('zob-mo').dataset.co = '';
+  buildBankMonths();
+  renderNal(); renderZob(); renderBank();
+}
+
+function showTab(id, el) {
+  ['nal','zob','bank','zbior'].forEach(t =>
+    document.getElementById('tab-'+t).style.display = 'none');
+  document.querySelectorAll('.mtab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+id).style.display = '';
+  if (el) el.classList.add('active');
+}
+
+function buildBankMonths() {
+  const bm = document.getElementById('bank-mo');
+  const prev = bm.value;
+  while (bm.options.length > 1) bm.remove(1);
+  const src = curCo === -1 ? TX : TX.filter(t => t.co === curCo);
+  [...new Set(src.map(t => t.dt.slice(0,7)))].sort().reverse().forEach(m => {
+    const o = document.createElement('option'); o.value = m; o.textContent = m;
+    bm.appendChild(o);
+  });
+  bm.value = prev;
+}
+
+function buildFvMonths(type, elId) {
+  const mo = document.getElementById(elId);
+  if (mo.dataset.co === String(curCo)) return;
+  const prev = mo.value;
+  while (mo.options.length > 1) mo.remove(1);
+  const src = (curCo === -1 ? FV : FV.filter(f => f.co === curCo))
+    .filter(f => f.t === type && f.brutto > 0);
+  [...new Set(src.map(f => f.data.slice(0,7)))].sort().reverse().forEach(m => {
+    const o = document.createElement('option'); o.value = m; o.textContent = m;
+    mo.appendChild(o);
+  });
+  mo.value = prev; mo.dataset.co = String(curCo);
+}
+
+function nalYrChanged() {
+  const yr = document.getElementById('nal-yr').value;
+  const mo = document.getElementById('nal-mo');
+  const prev = mo.value; while (mo.options.length > 1) mo.remove(1);
+  const src = (curCo===-1?FV:FV.filter(f=>f.co===curCo)).filter(f=>f.t==='out'&&f.brutto>0);
+  const months = [...new Set(src.filter(f=>!yr||f.data.startsWith(yr)).map(f=>f.data.slice(0,7)))].sort().reverse();
+  months.forEach(m=>{ const o=document.createElement('option');o.value=m;o.textContent=m;mo.appendChild(o); });
+  mo.value = months.includes(prev) ? prev : '';
+  renderNal();
+}
+
+function zobYrChanged() {
+  const yr = document.getElementById('zob-yr').value;
+  const mo = document.getElementById('zob-mo');
+  const prev = mo.value; while (mo.options.length > 1) mo.remove(1);
+  const src = (curCo===-1?FV:FV.filter(f=>f.co===curCo)).filter(f=>f.t==='in'&&f.brutto>0);
+  const months = [...new Set(src.filter(f=>!yr||f.data.startsWith(yr)).map(f=>f.data.slice(0,7)))].sort().reverse();
+  months.forEach(m=>{ const o=document.createElement('option');o.value=m;o.textContent=m;mo.appendChild(o); });
+  mo.value = months.includes(prev) ? prev : '';
+  renderZob();
+}
+
+function today() { return new Date().toISOString().slice(0,10); }
+
+/* ═══════════════════════════════════════════════════════
+   NALEŻNOŚCI
+═══════════════════════════════════════════════════════ */
+function fvOut() {
+  return (curCo===-1 ? FV : FV.filter(f=>f.co===curCo)).filter(f=>f.t==='out');
+}
+
+function filterNal() {
+  buildFvMonths('out','nal-mo');
+  const q   = (document.getElementById('nal-q').value||'').toLowerCase();
+  const st  = document.getElementById('nal-st').value;
+  const yr  = document.getElementById('nal-yr').value;
+  const mo  = document.getElementById('nal-mo').value;
+  const tod = today();
+
+  return fvOut().filter(f => {
+    if (f.brutto <= 0) return false;
+    if (q && !f.nr.toLowerCase().includes(q)
+           && !f.partner.toLowerCase().includes(q)
+           && !(f.fv_case||'').toLowerCase().includes(q)) return false;
+    if (mo && !f.data.startsWith(mo)) return false;
+    else if (!mo && yr && !f.data.startsWith(yr)) return false;
+    if (st === 'unpaid'  && (f.paid || isManual(f.co,f.nr) || f.mx))   return false;
+    if (st === 'partial' && (!f.mx || !f.partial)) return false;
+    if (st === 'paid'    && !f.paid && !isManual(f.co,f.nr) && !f.mx)   return false;
+    if (st === 'overdue' && (f.paid || isManual(f.co,f.nr) || f.mx || !f.due || f.due >= tod)) return false;
+    return true;
+  });
+}
+
+function renderNal() {
+  nalPage = 0;
+  const all      = fvOut().filter(f => f.brutto > 0);
+  const filtered = filterNal();
+  const sorted   = applySortFV(filtered, nalSort);
+  const tod      = today();
+
+  const isPaid   = f => f.paid || isManual(f.co, f.nr) || (f.mx && !f.partial);
+  const paidN    = filtered.filter(isPaid).length;
+  const openN    = filtered.filter(f => !isPaid(f) && !f.mx).length;
+  const overdueN = filtered.filter(f => !isPaid(f) && !f.mx && f.due && f.due < tod).length;
+  const sumBrutto = filtered.reduce((s,f)=>s+f.brutto, 0);
+  const sumNetto  = filtered.reduce((s,f)=>s+f.netto,  0);
+  const sumVat    = filtered.reduce((s,f)=>s+(f.vat||0), 0);
+  const sumOpen   = filtered.filter(f=>!isPaid(f)).reduce((s,f)=>s+f.do_zap, 0);
+  const vatOpen   = filtered.filter(f=>!isPaid(f)).reduce((s,f)=>s+(f.vat||0), 0);
+  const matchN    = filtered.filter(f=>f.mx || isManual(f.co, f.nr)).length;
+
+  document.getElementById('nal-kpi').innerHTML = `
+    <div class="metric"><div class="mlabel">Faktur łącznie</div>
+      <div class="mval blu">${filtered.length}</div>
+      <div class="pgbar"><div class="pgbar-track"><div class="pgbar-fill" style="width:${filtered.length?Math.round(paidN/filtered.length*100):0}%;background:#16a34a"></div></div>
+      <span>${filtered.length?Math.round(paidN/filtered.length*100):0}% opłacone</span></div></div>
+    <div class="metric"><div class="mlabel">Suma brutto / netto</div>
+      <div class="mval blu">${fmt(sumBrutto)} zł</div>
+      <div class="msub">Netto: ${fmt(sumNetto)} zł</div></div>
+    <div class="metric" style="border-color:#fde68a"><div class="mlabel">VAT należny (suma)</div>
+      <div class="mval org">${fmt(sumVat)} zł</div>
+      <div class="msub" style="color:#b45309">W nieopłaconych: ${fmt(vatOpen)} zł</div></div>
+    <div class="metric"><div class="mlabel">Bez wpływu bankowego</div>
+      <div class="mval red">${openN} FV · ${fmt(sumOpen)} zł</div>
+      ${overdueN ? `<div class="msub" style="color:#dc2626">w tym przeterminowane: ${overdueN}</div>` : ''}</div>
+    <div class="metric"><div class="mlabel">Dopasowane do banku</div>
+      <div class="mval grn">${matchN} FV</div></div>`;
+
+  renderNalPage(sorted);
+}
+
+function renderNalPage(data) {
+  const slice = data.slice(0, PAGE * (nalPage + 1));
+  const tb    = document.getElementById('nal-body');
+  if (!slice.length) { tb.innerHTML = '<tr><td colspan="9" class="empty">Brak wyników dla wybranych filtrów</td></tr>'; return; }
+
+  tb.innerHTML = slice.map(f => {
+    const hasMx = !!f.mx;
+    const mp    = isManual(f.co, f.nr);
+    const paid  = f.paid || mp;
+
+    const cls = paid ? 'pa' : f.cancelled ? '' : f.partial ? 'pe' : hasMx ? 'pt' : 'ov';
+
+    const pill = f.cancelled
+      ? '<span class="pill p-gry">🚫 Anulowana</span>'
+      : paid
+        ? `<span class="pill p-grn">✅ ${mp ? 'Ręcznie' : 'Opłacona'}</span>`
+        : f.partial
+          ? '<span class="pill p-org">🔶 Częściowa</span>'
+          : hasMx
+            ? '<span class="pill p-blu">🔗 W banku</span>'
+            : '<span class="pill p-red">⏳ Brak wpływu</span>';
+
+    const mbtn = (!f.paid && !f.cancelled)
+      ? `<button onclick="toggleManual(${f.co},'${f.nr.replace(/'/g,"\\'")}');event.stopPropagation()"
+           style="margin-top:3px;font-size:9px;padding:1px 6px;border-radius:4px;border:1px solid #e5e7eb;cursor:pointer;
+           background:${mp?'#fee2e2':'#f0fdf4'};color:${mp?'#dc2626':'#16a34a'};display:block">
+           ${mp ? '↩ Cofnij' : '✓ Oznacz jako zapłacona'}</button>`
+      : '';
+
+    const tx      = getTx(f.co, f.mx);
+    const bankHtml = tx
+      ? `<div class="bank-cell">
+           <span class="bank-kwota">+${fmt(Math.abs(tx.a))} zł</span>
+           <span class="bank-dt">📅 ${fmtDate(tx.dt)}</span>
+           ${tx.dc ? `<span class="bank-desc" title="${tx.dc}">${tx.dc.slice(0,60)}</span>` : ''}
+         </div>`
+      : '<span style="color:#d1d5db">—</span>';
+
+    // Nr sprawy: z TX lub ręcznie ustawiony
+    const autoCase = (tx && tx.case) || f.fv_case || '';
+    const caseStr  = getCase(f.co, f.nr, autoCase);
+    const nrEnc    = encodeURIComponent(f.nr);
+    const caseHtml = caseStr
+      ? `${caseBadge(caseStr)} <span onclick="doEditCase(${f.co},decodeURIComponent('${nrEnc}'))" style="cursor:pointer;font-size:9px;color:#9ca3af" title="Edytuj">✏</span>`
+      : `<span onclick="doEditCase(${f.co},decodeURIComponent('${nrEnc}'))" style="cursor:pointer;font-size:9px;color:#9ca3af">+ dodaj nr sprawy</span>`;
+
+    return `<tr class="${cls}">
+      <td>
+        <div class="fv-meta">
+          <span class="fv-nr">${coBadge(f.co)}${f.nr}</span>
+          <div class="fv-dates">
+            <span title="Data wystawienia">📄 ${fmtDate(f.data)}</span>
+          </div>
+        </div>
+      </td>
+      <td style="font-size:11px">${fmtDate(f.data)}</td>
+      <td class="partner-cell">
+        <div class="partner-name" title="${f.partner}">${f.partner || '—'}</div>
+        <div class="partner-sub">${caseHtml}</div>
+      </td>
+      <td>${dueBadge(f.due, paid)}</td>
+      <td style="text-align:right;color:#4b5563">${fmt(f.netto)}</td>
+      <td style="text-align:right">${vatCell(f.vat)}</td>
+      <td style="text-align:right;font-weight:700">${fmt(f.brutto)}</td>
+      <td>${pill}${mbtn}</td>
+      <td>${bankHtml}</td>
+    </tr>`;
+  }).join('');
+
+  const info = document.getElementById('nal-info');
+  info.innerHTML = `<span>Wyświetlono ${slice.length} z ${data.length} faktur</span>`;
+  if (data.length > slice.length) {
+    const b = document.createElement('button');
+    b.className = 'btn'; b.textContent = 'Załaduj więcej';
+    b.onclick = () => { nalPage++; renderNalPage(data); };
+    info.appendChild(b);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   ZOBOWIĄZANIA
+═══════════════════════════════════════════════════════ */
+function fvIn() {
+  return (curCo===-1 ? FV : FV.filter(f=>f.co===curCo)).filter(f=>f.t==='in');
+}
+
+function filterZob() {
+  buildFvMonths('in','zob-mo');
+  const q   = (document.getElementById('zob-q').value||'').toLowerCase();
+  const st  = document.getElementById('zob-st').value;
+  const yr  = document.getElementById('zob-yr').value;
+  const mo  = document.getElementById('zob-mo').value;
+  const tod = today();
+
+  return fvIn().filter(f => {
+    if (f.brutto <= 0) return false;
+    if (q && !f.nr.toLowerCase().includes(q)
+           && !f.partner.toLowerCase().includes(q)
+           && !(f.fv_case||'').toLowerCase().includes(q)) return false;
+    if (mo && !f.data.startsWith(mo)) return false;
+    else if (!mo && yr && !f.data.startsWith(yr)) return false;
+    if (st === 'matched'   && !f.mx) return false;
+    if (st === 'unmatched' && f.mx)  return false;
+    if (st === 'overdue'   && (f.mx || !f.due || f.due >= tod)) return false;
+    return true;
+  });
+}
+
+function renderZob() {
+  zobPage = 0;
+  const filtered = filterZob();
+  const sorted   = applySortFV(filtered, zobSort);
+  const tod      = today();
+
+  const matched   = filtered.filter(f=>f.mx).length;
+  const overdueN  = filtered.filter(f=>!f.mx && f.due && f.due < tod).length;
+  const sumAll    = filtered.reduce((s,f)=>s+f.brutto, 0);
+  const sumNetto  = filtered.reduce((s,f)=>s+f.netto,  0);
+  const sumVatZ   = filtered.reduce((s,f)=>s+(f.vat||0), 0);
+  const sumMatch  = filtered.filter(f=>f.mx).reduce((s,f)=>s+f.brutto, 0);
+  const sumUnpaid = filtered.filter(f=>!f.mx).reduce((s,f)=>s+f.brutto, 0);
+  const vatUnpaid = filtered.filter(f=>!f.mx).reduce((s,f)=>s+(f.vat||0), 0);
+
+  document.getElementById('zob-kpi').innerHTML = `
+    <div class="metric"><div class="mlabel">Faktur łącznie</div>
+      <div class="mval blu">${filtered.length}</div></div>
+    <div class="metric"><div class="mlabel">Suma brutto / netto</div>
+      <div class="mval org">${fmt(sumAll)} zł</div>
+      <div class="msub">Netto: ${fmt(sumNetto)} zł</div></div>
+    <div class="metric" style="border-color:#fde68a"><div class="mlabel">VAT naliczony (suma)</div>
+      <div class="mval org">${fmt(sumVatZ)} zł</div>
+      <div class="msub" style="color:#b45309">Niedopasowane: ${fmt(vatUnpaid)} zł</div></div>
+    <div class="metric"><div class="mlabel">Dopasowane do banku</div>
+      <div class="mval grn">${matched}/${filtered.length}</div>
+      <div class="pgbar"><div class="pgbar-track"><div class="pgbar-fill" style="width:${filtered.length?Math.round(matched/filtered.length*100):0}%;background:#16a34a"></div></div>
+      <span>${filtered.length?Math.round(matched/filtered.length*100):0}%</span></div></div>
+    <div class="metric"><div class="mlabel">Przeterminowane</div>
+      <div class="mval ${overdueN?'red':'grn'}">${overdueN}</div></div>`;
+
+  renderZobPage(sorted);
+}
+
+function renderZobPage(data) {
+  const slice = data.slice(0, PAGE * (zobPage + 1));
+  const tb    = document.getElementById('zob-body');
+  if (!slice.length) { tb.innerHTML = '<tr><td colspan="9" class="empty">Brak wyników dla wybranych filtrów</td></tr>'; return; }
+
+  tb.innerHTML = slice.map(f => {
+    const hasMx = !!f.mx;
+    const pill  = hasMx
+      ? '<span class="pill p-grn">🔗 Dopasowana</span>'
+      : '<span class="pill p-gry">❓ Brak dopasowania</span>';
+
+    const tx       = getTx(f.co, f.mx);
+    const bankHtml = tx
+      ? `<div class="bank-cell">
+           <span class="bank-kwota" style="color:#dc2626">−${fmt(Math.abs(tx.a))} zł</span>
+           <span class="bank-dt">📅 ${fmtDate(tx.dt)}</span>
+           ${tx.dc ? `<span class="bank-desc" title="${tx.dc}">${tx.dc.slice(0,60)}</span>` : ''}
+         </div>`
+      : '<span style="color:#d1d5db">—</span>';
+
+    const autoCase = (tx && tx.case) || f.fv_case || '';
+    const caseStr  = getCase(f.co, f.nr, autoCase);
+    const nrEnc    = encodeURIComponent(f.nr);
+    const caseHtml = caseStr
+      ? `${caseBadge(caseStr)} <span onclick="doEditCase(${f.co},decodeURIComponent('${nrEnc}'))" style="cursor:pointer;font-size:9px;color:#9ca3af" title="Edytuj">✏</span>`
+      : `<span onclick="doEditCase(${f.co},decodeURIComponent('${nrEnc}'))" style="cursor:pointer;font-size:9px;color:#9ca3af">+ dodaj nr sprawy</span>`;
+
+    return `<tr class="${hasMx?'pa':''}">
+      <td>
+        <div class="fv-meta">
+          <span class="fv-nr">${coBadge(f.co)}${f.nr}</span>
+        </div>
+      </td>
+      <td style="font-size:11px">${fmtDate(f.data)}</td>
+      <td class="partner-cell">
+        <div class="partner-name" title="${f.partner}">${f.partner || '—'}</div>
+        <div class="partner-sub">${caseHtml}</div>
+      </td>
+      <td>${dueBadge(f.due, hasMx)}</td>
+      <td style="text-align:right;color:#4b5563">${fmt(f.netto)}</td>
+      <td style="text-align:right">${vatCell(f.vat)}</td>
+      <td style="text-align:right;font-weight:700">${fmt(f.brutto)}</td>
+      <td>${pill}</td>
+      <td>${bankHtml}</td>
+    </tr>`;
+  }).join('');
+
+  const info = document.getElementById('zob-info');
+  info.innerHTML = `<span>Wyświetlono ${slice.length} z ${data.length}</span>`;
+  if (data.length > slice.length) {
+    const b = document.createElement('button');
+    b.className = 'btn'; b.textContent = 'Załaduj więcej';
+    b.onclick = () => { zobPage++; renderZobPage(data); };
+    info.appendChild(b);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   TRANSAKCJE BANKOWE
+═══════════════════════════════════════════════════════ */
+function txForCo() { return curCo === -1 ? TX : TX.filter(t => t.co === curCo); }
+
+function filterBank() {
+  const q     = (document.getElementById('bank-q').value||'').toLowerCase();
+  const dir   = document.getElementById('bank-dir').value;
+  const cf    = document.getElementById('bank-case').value;
+  const match = document.getElementById('bank-match').value;
+  const mo    = document.getElementById('bank-mo').value;
+
+  return txForCo().filter(t => {
+    if (dir === 'in'  && t.a <= 0) return false;
+    if (dir === 'out' && t.a >= 0) return false;
+    if (mo && !t.dt.startsWith(mo)) return false;
+    if (cf === 'withcase' && !t.case) return false;
+    if (cf === 'nocase'   && t.case)  return false;
+    if (match === 'matched'   && !t.ref) return false;
+    if (match === 'unmatched' && t.ref)  return false;
+    if (q && !t.dc.toLowerCase().includes(q)
+          && !(t.case||'').toLowerCase().includes(q)
+          && !(t.ref||'').toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a,b) => b.dt.localeCompare(a.dt));
+}
+
+function renderBank() {
+  bankPage = 0;
+  const filtered = filterBank();
+  const sumInc   = filtered.filter(t=>t.a>0).reduce((s,t)=>s+t.a, 0);
+  const sumOut   = filtered.filter(t=>t.a<0).reduce((s,t)=>s+t.a, 0);
+  const linked   = filtered.filter(t=>t.ref).length;
+  const withCase = filtered.filter(t=>t.case).length;
+
+  document.getElementById('bank-kpi').innerHTML = `
+    <div class="metric"><div class="mlabel">Operacji</div><div class="mval blu">${filtered.length}</div></div>
+    <div class="metric"><div class="mlabel">Wpływy</div><div class="mval grn">+${fmt(sumInc)} zł</div></div>
+    <div class="metric"><div class="mlabel">Wydatki</div><div class="mval red">−${fmt(Math.abs(sumOut))} zł</div></div>
+    <div class="metric"><div class="mlabel">Dopasowane do FV / Z nr sprawy</div>
+      <div class="mval pur">${linked} / ${withCase}</div></div>`;
+
+  renderBankPage(filtered);
+}
+
+function renderBankPage(data) {
+  const slice = data.slice(0, PAGE * (bankPage + 1));
+  const tb    = document.getElementById('bank-body');
+  if (!slice.length) { tb.innerHTML = '<tr><td colspan="5" class="empty">Brak operacji dla wybranych filtrów</td></tr>'; return; }
+
+  tb.innerHTML = slice.map(t => {
+    const cls   = t.a > 0 ? (t.ref?'pa':'pt') : (t.ref?'pa':'ov');
+    const col   = t.a > 0 ? '#16a34a' : '#dc2626';
+    const sign  = t.a > 0 ? '+' : '−';
+    const cbadge = curCo===-1
+      ? `<span class="pill" style="background:${CO_CFG[t.co].col}22;color:${CO_CFG[t.co].col};font-size:8px;margin-right:4px">${['EV','JW','EN'][t.co]}</span>`
+      : '';
+    const matchHtml = t.ref
+      ? `<span class="pill p-grn" style="font-size:9px">🔗 ${t.ref}</span>`
+      : '<span style="color:#d1d5db;font-size:10px">—</span>';
+
+    return `<tr class="${cls}">
+      <td style="font-size:11px;font-weight:500">${fmtDate(t.dt)}</td>
+      <td style="font-size:11px">${cbadge}<span title="${t.dc}">${t.dc.slice(0,110)}</span></td>
+      <td style="text-align:right;font-weight:700;color:${col};font-size:13px">${sign}${fmt(Math.abs(t.a))} zł</td>
+      <td>${caseBadge(t.case)}</td>
+      <td>${matchHtml}</td>
+    </tr>`;
+  }).join('');
+
+  const info = document.getElementById('bank-info');
+  info.innerHTML = `<span>Wyświetlono ${slice.length} z ${data.length} operacji</span>`;
+  if (data.length > slice.length) {
+    const b = document.createElement('button');
+    b.className = 'btn'; b.textContent = 'Załaduj więcej';
+    b.onclick = () => { bankPage++; renderBankPage(data); };
+    info.appendChild(b);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   ZESTAWIENIE ZBIORCZE
+═══════════════════════════════════════════════════════ */
+function renderZbior() {
+  let html = '<div class="zbior-grid">';
+  for (let co = 0; co < 3; co++) {
+    const c   = CO_CFG[co];
+    const out = FV.filter(f=>f.co===co&&f.t==='out'&&f.brutto>0);
+    const inp = FV.filter(f=>f.co===co&&f.t==='in'&&f.brutto>0);
+    const txs = TX.filter(t=>t.co===co);
+
+    const paidOut   = out.filter(f=>f.paid||(f.mx&&!f.partial)).length;
+    const openOut   = out.filter(f=>!f.paid&&!f.mx).length;
+    const sumOpen   = out.filter(f=>!f.paid).reduce((s,f)=>s+f.do_zap, 0);
+    const sumInc    = txs.filter(t=>t.a>0).reduce((s,t)=>s+t.a, 0);
+    const sumOutT   = txs.filter(t=>t.a<0).reduce((s,t)=>s+t.a, 0);
+    const matchIn   = inp.filter(f=>f.mx).length;
+    const withCase  = txs.filter(t=>t.case).length;
+    const vatNalezny   = out.reduce((s,f)=>s+(f.vat||0), 0);
+    const vatNaliczony = inp.reduce((s,f)=>s+(f.vat||0), 0);
+    const vatSaldo     = vatNalezny - vatNaliczony;
+
+    html += `<div class="zbior-card">
+      <div class="zbior-header" style="background:${c.col}">${c.name}</div>
+      <div class="zbior-body">
+        <div class="metric"><div class="mlabel">Należności</div>
+          <div class="mval" style="font-size:16px">${out.length} FV</div>
+          <div class="msub">${paidOut} opłacone · ${openOut} bez wpływu</div></div>
+        <div class="metric" style="border-color:#fee2e2"><div class="mlabel">Nieopłacone brutto</div>
+          <div class="mval red" style="font-size:16px">${fmt(sumOpen)} zł</div></div>
+        <div class="metric" style="border-color:#fde68a"><div class="mlabel">VAT należny</div>
+          <div class="mval org" style="font-size:16px">${fmt(vatNalezny)} zł</div>
+          <div class="msub">z faktur sprzedaży</div></div>
+        <div class="metric" style="border-color:#fde68a"><div class="mlabel">VAT naliczony</div>
+          <div class="mval org" style="font-size:16px">${fmt(vatNaliczony)} zł</div>
+          <div class="msub">z faktur zakupu</div></div>
+        <div class="metric" style="border-color:${vatSaldo>=0?'#fde68a':'#dcfce7'}"><div class="mlabel">Saldo VAT do zapłaty</div>
+          <div class="mval" style="font-size:16px;color:${vatSaldo>=0?'#d97706':'#16a34a'}">${vatSaldo>=0?'+':''}${fmt(vatSaldo)} zł</div>
+          <div class="msub">${vatSaldo>=0?'do urzędu skarbowego':'nadpłata VAT'}</div></div>
+        <div class="metric" style="border-color:#dcfce7"><div class="mlabel">Wpływy bankowe</div>
+          <div class="mval grn" style="font-size:15px">${fmt(sumInc)} zł</div>
+          <div class="msub">${txs.filter(t=>t.a>0).length} trans.</div></div>
+        <div class="metric" style="border-color:#fee2e2"><div class="mlabel">Wydatki bankowe</div>
+          <div class="mval red" style="font-size:15px">${fmt(Math.abs(sumOutT))} zł</div>
+          <div class="msub">${txs.filter(t=>t.a<0).length} trans.</div></div>
+        <div class="metric" style="border-color:#dbeafe"><div class="mlabel">Zobowiązania — match</div>
+          <div class="mval blu" style="font-size:15px">${matchIn}/${inp.length}</div>
+          <div class="pgbar"><div class="pgbar-track"><div class="pgbar-fill" style="width:${inp.length?Math.round(matchIn/inp.length*100):0}%;background:${c.col}"></div></div>
+          <span>${inp.length?Math.round(matchIn/inp.length*100):0}%</span></div></div>
+        <div class="metric" style="border-color:#ede9fe"><div class="mlabel">Transakcje sądowe/km</div>
+          <div class="mval pur" style="font-size:15px">${withCase}</div>
+          <div class="msub">z ${txs.length} operacji</div></div>
+      </div></div>`;
+  }
+  html += '</div>';
+
+  const allOut        = FV.filter(f=>f.t==='out'&&f.brutto>0);
+  const allIn         = FV.filter(f=>f.t==='in'&&f.brutto>0);
+  const totalUnp      = allOut.filter(f=>!f.paid).reduce((s,f)=>s+f.do_zap, 0);
+  const totalInc      = TX.filter(t=>t.a>0).reduce((s,t)=>s+t.a, 0);
+  const totalOut      = TX.filter(t=>t.a<0).reduce((s,t)=>s+t.a, 0);
+  const totalCase     = TX.filter(t=>t.case).length;
+  const totalMatch    = allIn.filter(f=>f.mx).length;
+  const totalVatNal   = allOut.reduce((s,f)=>s+(f.vat||0), 0);
+  const totalVatNalic = allIn.reduce((s,f)=>s+(f.vat||0),  0);
+  const totalVatSaldo = totalVatNal - totalVatNalic;
+
+  html += `<div class="zbior-total">
+    <div class="zbior-total-header">Łącznie wszystkie firmy</div>
+    <div class="zbior-total-body" style="grid-template-columns:repeat(7,1fr)">
+      <div class="metric"><div class="mlabel">FV wystawione</div><div class="mval blu">${allOut.length}</div></div>
+      <div class="metric" style="border-color:#fee2e2"><div class="mlabel">Łączne nieopłacone</div><div class="mval red">${fmt(totalUnp)} zł</div></div>
+      <div class="metric" style="border-color:#fde68a"><div class="mlabel">VAT należny łącznie</div><div class="mval org">${fmt(totalVatNal)} zł</div></div>
+      <div class="metric" style="border-color:#fde68a"><div class="mlabel">VAT naliczony łącznie</div><div class="mval org">${fmt(totalVatNalic)} zł</div></div>
+      <div class="metric" style="border-color:${totalVatSaldo>=0?'#fde68a':'#dcfce7'}">
+        <div class="mlabel">Saldo VAT (należny − naliczony)</div>
+        <div class="mval" style="color:${totalVatSaldo>=0?'#d97706':'#16a34a'};font-size:18px">${totalVatSaldo>=0?'+':''}${fmt(totalVatSaldo)} zł</div>
+        <div class="msub">${totalVatSaldo>=0?'▲ do zapłaty US':'▼ nadpłata'}</div></div>
+      <div class="metric" style="border-color:#dcfce7"><div class="mlabel">Łączne wpływy</div><div class="mval grn">${fmt(totalInc)} zł</div></div>
+      <div class="metric" style="border-color:#ede9fe"><div class="mlabel">Trans. sądowe/km</div><div class="mval pur">${totalCase}</div></div>
+    </div></div>`;
+
+  document.getElementById('zbior-content').innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════════════
+   EXPORT CSV
+═══════════════════════════════════════════════════════ */
+function exportTab(tab) {
+  let rows, hdr, name;
+  const coName = co => ['EMUN Valuations','JW Wycena','EMUN Nieruchomości'][co];
+
+  if (tab === 'nal') {
+    hdr = 'Firma;Numer FV;Data wystawienia;Kontrahent;Termin płatności;Nr sprawy;Netto;VAT;Brutto;Do zapłaty;Status;Przelew kwota;Przelew data;Przelew opis';
+    rows = filterNal().map(f => {
+      const tx = getTx(f.co, f.mx);
+      const caseStr = getCase(f.co, f.nr, (tx&&tx.case)||f.fv_case||'');
+      const status = f.paid?'Opłacona':isManual(f.co,f.nr)?'Ręcznie opłacona':f.partial?'Częściowa':f.mx?'W banku':'Brak wpływu';
+      return [coName(f.co), f.nr, f.data, f.partner, f.due||'', caseStr,
+              f.netto, f.vat||0, f.brutto, f.do_zap, status,
+              tx?Math.abs(tx.a):'', tx?tx.dt:'', tx?tx.dc.slice(0,80):''].join(';');
+    });
+    name = 'naleznosci.csv';
+  } else if (tab === 'zob') {
+    hdr = 'Firma;Numer FV;Data wystawienia;Kontrahent;Termin płatności;Nr sprawy;Netto;VAT;Brutto;Dopasowanie;Data przelewu;Kwota przelewu;Opis przelewu';
+    rows = filterZob().map(f => {
+      const tx = getTx(f.co, f.mx);
+      const caseStr = getCase(f.co, f.nr, (tx&&tx.case)||f.fv_case||'');
+      return [coName(f.co), f.nr, f.data, f.partner, f.due||'', caseStr,
+              f.netto, f.vat||0, f.brutto, f.mx?'Tak':'Nie',
+              tx?tx.dt:'', tx?Math.abs(tx.a):'', tx?tx.dc.slice(0,80):''].join(';');
+    });
+    name = 'zobowiazania.csv';
+  } else {
+    hdr = 'Firma;Data;Opis operacji;Kwota;Nr sprawy;Dopasowana FV';
+    rows = filterBank().map(t =>
+      [coName(t.co), t.dt, t.dc.replace(/;/g,' '), t.a, t.case||'', t.ref||''].join(';'));
+    name = 'transakcje.csv';
+  }
+
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent([hdr,...rows].join('\n'));
+  a.download = name; a.click();
+}
+
+/* ═══════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════ */
+setCo(0, document.querySelector('.co-tab'));
+</script>
+</body></html>
