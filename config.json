@@ -6,7 +6,7 @@
       "name": "EMUN Valuations Sp. z o.o.",
       "nip": "5252983281",
       "konto": "96 1140 2004 0000 3502 8434 7003",
-      "konto_suffix": "7003",
+      "konto_suffix": "84347003",
       "vat_rate": 23,
       "client_id": "Yn66f6hB9AK8G9rjGmiGBA0300008e08",
       "client_secret": "dbEuZsw2BdIKROqyy4DlQdCPpnJ4XxlCPt0cmcLySpPzm7wR"
@@ -16,7 +16,7 @@
       "name": "JACEK WINNICKI Wycena Nieruchomości",
       "nip": "9211815270",
       "konto": "61 1140 2004 0000 3002 7791 5032",
-      "konto_suffix": "5032",
+      "konto_suffix": "77915032",
       "vat_rate": 23,
       "client_id": "bsL3sGXcFil+FxFbuEEFlw00009b1b82",
       "client_secret": "+qCyNA03nEdhKSHRmcqfeUuCnIknuSCkQ4/N8YQE9wMTvZd1"
@@ -26,7 +26,7 @@
       "name": "EMUN Nieruchomości Sp. z o.o.",
       "nip": "9212034014",
       "konto": "78 1140 2004 0000 3202 7661 4246",
-      "konto_suffix": "4246",
+      "konto_suffix": "76614246",
       "vat_rate": 0,
       "client_id": "ScBuhspNKJ2iklND2JQWLA0000012825",
       "client_secret": "MRg4XDms7K8rsv5k2azrsEEvLeJQby71JpUQJEhmR+6K3Uay"
