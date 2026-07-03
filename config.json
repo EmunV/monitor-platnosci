@@ -1,34 +1,37 @@
 {
-  "_comment": "Dane dostępowe do API Betterfly. Dla każdej firmy: Konto Użytkownika → Zarządzaj kontem → Publiczne API",
+  "_comment": "Dane dostepowe do API Betterfly. Dla kazdej firmy: Konto Uzytkownika -> Zarzadzaj kontem -> Publiczne API",
   "firms": [
     {
       "co": 0,
       "name": "EMUN Valuations Sp. z o.o.",
+      "file_tag": "_EV_",
       "nip": "5252983281",
       "konto": "96 1140 2004 0000 3502 8434 7003",
       "konto_suffix": "84347003",
       "vat_rate": 23,
       "client_id": "Yn66f6hB9AK8G9rjGmiGBA0300008e08",
-      "client_secret": "dbEuZsw2BdIKROqyy4DlQdCPpnJ4XxlCPt0cmcLySpPzm7wR"
+      "client_secret": "dbEuZsw2BdIKROqyy4D1QdCPpnJ4Xx1CPt0cmcLySpPzm7wR"
     },
     {
       "co": 1,
       "name": "JACEK WINNICKI Wycena Nieruchomości",
+      "file_tag": "_JWWN_",
       "nip": "9211815270",
       "konto": "61 1140 2004 0000 3002 7791 5032",
       "konto_suffix": "77915032",
       "vat_rate": 23,
-      "client_id": "bsL3sGXcFil+FxFbuEEFlw00009b1b82",
+      "client_id": "bsL3sGXcFil+FxFbuEEF1w00009b1b82",
       "client_secret": "+qCyNA03nEdhKSHRmcqfeUuCnIknuSCkQ4/N8YQE9wMTvZd1"
     },
     {
       "co": 2,
       "name": "EMUN Nieruchomości Sp. z o.o.",
+      "file_tag": "_EN_",
       "nip": "9212034014",
       "konto": "78 1140 2004 0000 3202 7661 4246",
       "konto_suffix": "76614246",
       "vat_rate": 0,
-      "client_id": "ScBuhspNKJ2iklND2JQWLA0000012825",
+      "client_id": "ScBuhspNKJ2ik1ND2JQWLA0000012825",
       "client_secret": "MRg4XDms7K8rsv5k2azrsEEvLeJQby71JpUQJEhmR+6K3Uay"
     }
   ],
